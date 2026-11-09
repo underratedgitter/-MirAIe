@@ -3,7 +3,6 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
-graphify-out/
 .DS_Store
 *.log
 .env
