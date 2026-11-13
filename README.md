@@ -22,6 +22,7 @@ Click the ❄️ icon in your menu bar to:
 app.py                     rumps UI (generic — knows nothing about brands)
 bridge.py                  background asyncio loop + provider lifecycle
 config.py                  settings file + Keychain helpers
+providers/__init__.py      provider registry and factory (make_provider)
 providers/base.py          the universal contract: Provider / ClimateDevice / ChoiceControl
 providers/miraie.py        Panasonic MirAIe provider
 providers/homeassistant.py Home Assistant provider
@@ -33,7 +34,7 @@ bridge need no changes.
 
 ## Setup
 
-Python 3.9+ is required (built and tested with Python 3.14).
+Python 3.9+ is required (built and tested with Python 3.14). No compilation or build step is needed (pure Python using rumps and PyObjC), and no special macOS system permissions (Accessibility, Screen Recording, etc.) are required.
 
 ```bash
 cd ~/Documents/repos/miraie-menubar
@@ -90,11 +91,15 @@ rm ~/Library/LaunchAgents/com.local.miraie-menubar.plist
 ## Tests
 
 ```bash
+# Standalone smoke test (bridge plumbing, generic UI, provider mappings)
 .venv/bin/python smoke_test.py
+
+# Full test suite including Home Assistant auth regression tests (19 tests)
+.venv/bin/pytest
 ```
 
-Offline checks of the async bridge, the generic device UI, and both providers'
-mapping logic (no network, no dialogs).
+Offline checks of the async bridge, the generic device UI, both providers'
+mapping logic, and Home Assistant authentication (no network, no dialogs).
 
 ## Troubleshooting
 
@@ -102,8 +107,8 @@ mapping logic (no network, no dialogs).
   what Panasonic's servers reply.
 - **"HTTP 401: Home Assistant rejected the access token"** — recreate the token and
   set up the provider again.
-- **Menu shows ⚠︎** — hover the top info line for details; errors are also appended
-  to `app.err.log`.
+- **Menu shows ⚠︎** — open the menu to read the top info line for details; errors
+  are also shown in an alert dialog and appended to `app.err.log`.
 - **AC shows offline** — the AC is disconnected from Wi-Fi, or the cloud is having
   a moment. Commands still get queued through MQTT when possible.
 - The MirAIe phone app can be used alongside this app; both see each other's changes.
